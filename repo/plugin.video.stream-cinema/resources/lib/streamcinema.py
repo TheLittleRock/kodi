@@ -81,6 +81,10 @@ class Scinema:
 
     def action(self):
         action = self.args.get(SC.ITEM_ACTION)
+
+        if isinstance(action, list):
+            action = action[0]
+
         if action == SC.ACTION_PLAY_URL:
             self.play_url(self.args.get(SC.ITEM_URL))
             self.succeeded = True
@@ -105,6 +109,12 @@ class Scinema:
             from resources.lib.kodiutils import check_set_debug
 
             check_set_debug(True)
+
+        elif action == 'manage_tokens':
+            from resources.lib.api.sc import Sc
+            Sc.manage_tokens()
+            return True
+
         elif action == SC.ACTION_DOWNLOAD:
             self.url = self.args.get(SC.ITEM_DOWNLOAD)
             self.call_url_and_response()

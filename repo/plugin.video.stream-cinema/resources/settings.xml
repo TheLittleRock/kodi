@@ -13,6 +13,7 @@
         <setting type="text" label="30072" id="system.auth_token" default="" enable="false"/>
         <setting type="text" id="system.changelog" default="" visible="false"/>
         <setting type="text" id="kraska.chsum" default="" visible="false"/>
+        <setting type="action" label="Správa TOKENů" action="RunPlugin(plugin://plugin.video.stream-cinema?action=manage_tokens)" />
     </category>
     <category label="30019">
         <setting type="bool" label="30060" id="plugin.show.genre" default="false"/>

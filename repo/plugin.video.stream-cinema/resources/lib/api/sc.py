@@ -48,8 +48,15 @@ class Sc:
         else:
             dok("Chyba", "Neplatný token. Akce zrušena.")
             return None'''
+    
+    token_prompt_shown = False
+
     @staticmethod
     def handle_token_error():
+        if Sc.token_prompt_shown:
+            return None
+        Sc.token_prompt_shown = True
+
         # Load tokens from settings
         tokens_json = ADDON.getSetting('system.auth_tokens')
         tokens = []
@@ -58,9 +65,21 @@ class Sc:
                 tokens = json.loads(tokens_json)
             except Exception:
                 tokens = []
-        # Prepare menu options
-        options = [t for t in tokens]
+
+        # Get current token from settings
+        current_token = ADDON.getSetting('system.auth_token')
+        options = []
+        current_token_index = None
+
+        # Build options, marking the current token
+        for idx, t in enumerate(tokens):
+            if t == current_token:
+                options.append("[AKTIVNÍ] {}".format(t))
+                current_token_index = idx
+            else:
+                options.append(t)
         options.append('[+] Přidat nový token')
+
         # Show selection dialog
         selected = dselect(options, "Vyberte TOKEN nebo přidejte nový")
         if selected is None:
@@ -78,10 +97,67 @@ class Sc:
                 dok("Chyba", "Neplatný token. Akce zrušena.")
                 return None
         else:
-            # Use selected token
-            token = tokens[selected]
+            # Use selected token (strip marker if present)
+            if options[selected].startswith("[AKTIVNÍ]"):
+                token = tokens[selected]
+            else:
+                token = tokens[selected]
             ADDON.setSetting('system.auth_token', token)
             return token
+        
+    @staticmethod
+    def manage_tokens():
+        # Load tokens from settings
+        tokens_json = ADDON.getSetting('system.auth_tokens')
+        tokens = []
+        if tokens_json:
+            try:
+                tokens = json.loads(tokens_json)
+            except Exception:
+                tokens = []
+
+        current_token = ADDON.getSetting('system.auth_token')
+        while True:
+            options = []
+            for idx, t in enumerate(tokens):
+                if t == current_token:
+                    options.append("[AKTIVNÍ] {}".format(t))
+                else:
+                    options.append(t)
+            options.append('[+] Přidat nový token')
+            if tokens:
+                options.append('[–] Smazat token')
+            options.append('[Zavřít]')
+
+            selected = dselect(options, "Správa TOKENů")
+            if selected is None or options[selected] == '[Zavřít]':
+                break
+            if options[selected] == '[+] Přidat nový token':
+                new_token = dinput("Zadejte nový TOKEN:", "")
+                if new_token and len(new_token) == 32:
+                    tokens.append(new_token)
+                    ADDON.setSetting('system.auth_tokens', json.dumps(tokens))
+                    ADDON.setSetting('system.auth_token', new_token)
+                    current_token = new_token
+                else:
+                    dok("Chyba", "Neplatný token. Akce zrušena.")
+            elif options[selected] == '[–] Smazat token':
+                if not tokens:
+                    dok("Chyba", "Žádné tokeny k odstranění.")
+                    continue
+                del_idx = dselect(tokens, "Vyberte token k odstranění")
+                if del_idx is not None:
+                    del_token = tokens.pop(del_idx)
+                    if del_token == current_token:
+                        # If deleted token was current, unset
+                        ADDON.setSetting('system.auth_token', "")
+                        current_token = ""
+                    ADDON.setSetting('system.auth_tokens', json.dumps(tokens))
+            else:
+                # Select token
+                sel_token = tokens[selected] if not options[selected].startswith("[AKTIVNÍ]") else current_token
+                ADDON.setSetting('system.auth_token', sel_token)
+                current_token = sel_token
 
     @staticmethod
     def get(path, params=None, ttl=None):
