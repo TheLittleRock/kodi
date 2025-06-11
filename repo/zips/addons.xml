@@ -1,0 +1,122 @@
+<?xml version='1.0' encoding='utf-8'?>
+<addons><addon id="plugin.video.stream-cinema" name="Stream Cinema CZ a SK - token selection edition" provider-name="bbaron" version="1.0">
+    <requires>
+        <import addon="xbmc.python" version="3.0.0" />
+        <import addon="script.module.requests" version="2.25.1" />
+        <import addon="script.module.websocket" version="0.58.0" />
+        <import addon="script.module.trakt" version="4.4.0" />
+        <import addon="service.upnext" version="1.1.5" />
+    </requires>
+    <extension library="main.py" point="xbmc.python.pluginsource">
+        <provides>video</provides>
+    </extension>
+    <extension library="service.py" point="xbmc.service" start="startup">
+        <provides>service</provides>
+    </extension>
+    <extension point="xbmc.python.script" library="script.py">
+        <provides>executable</provides>
+    </extension>
+    <extension point="xbmc.addon.metadata">
+        <summary lang="en">stream-cinema.online - play content from kra.sk[CR]For operation it is necessary to
+            [I]register at kra.sk and have an active subscription[/I].
+        </summary>
+        <summary lang="cs">stream-cinema.online - přehrávání obsahu z kra.sk[CR]Pre provoz je potřebná
+            [I]registrace na kra.sk s aktivním předplatným[/I].
+        </summary>
+        <summary lang="sk">stream-cinema.online - prehrávanie obsahu z kra.sk[CR]Pre prevádzku je potrebná
+            [I]registrácia na kra.sk s aktívnym predplatným[/I].
+        </summary>
+        <platform>all</platform>
+        <license>GNU GENERAL PUBLIC LICENSE. Version 3, 29 June 2007</license>
+        <source>https://github.com/bbaronSVK/plugin.video.stream-cinema.git</source>
+        <assets>
+            <icon>icon.png</icon>
+            <fanart>fanart.jpg</fanart>
+            <screenshot>resources/screenshots/screenshot-01.jpg</screenshot>
+            <screenshot>resources/screenshots/screenshot-02.jpg</screenshot>
+            <screenshot>resources/screenshots/screenshot-03.jpg</screenshot>
+        </assets>
+        <disclaimer lang="en">The author of this addon does not provide any content and has no affiliation with content
+            providers. This addon only searches shared content on kra.sk. Use at your own risk!
+        </disclaimer>
+        <disclaimer lang="sk">Autor tohto doplnku neposkytuje žiaden obsah a nie je nijak prepojený s poskytovateľmi
+            obsahu. Tento doplnok iba vyhľadáva sprístupnený obsah na kra.sk. Použitie na vlastnú zodpovednosť!
+        </disclaimer>
+        <disclaimer lang="cs">Autor tohoto doplňku neposkytuje žádný obsah a není nijako propojený s poskytovatelemi
+            obsahu. Tento doplňek pouze vyhledáva zpřístupněný obsah na kra.sk. Použití na vlastní odpovědnost!
+        </disclaimer>
+        <news>[B]Novinky[/B]
+              [I][B]2.2.09.3[/B][/I]
+            * [COLOR FFFFAE42]fix[/COLOR] schotav tlacitlo "preskocit" ak sa neprehrava video
+
+              [I][B]2.2.09.2[/B][/I]
+            * [COLOR FF50FF42]add[/COLOR] automaticky preskoci znelku, ak uz raz bola preskocena
+
+              [I][B]2.2.09.1[/B][/I]
+            * [COLOR FFFFAE42]fix[/COLOR] moznost kliknut/focus na tlacitko preskocit
+
+              [I][B]2.2.09[/B][/I]
+            * [COLOR FF50FF42]add[/COLOR] moznost preskocit znelku serialu
+            * [COLOR FF50FF42]add[/COLOR] vylepsene casovanie upnext
+
+              [I][B]2.2.01[/B][/I]
+            * [COLOR FF50FF42]add[/COLOR] automaticke premazavanie nahladov z KODI, ktore sa nepouzivali aspon 1 mesiac
+            * [COLOR FF50FF42]add[/COLOR] moznost zvolit si preferovany jazyk pre serial/film (pri zapnutom automatickom vybere streamu)
+            * [COLOR FF50FF42]add[/COLOR] oznacovanie serii v serialoch ako videne, ak mate trakt.tv a seriu mate celu pozrenu
+            * [COLOR FF50FF42]add[/COLOR] pridana moznost do nastaveni na kompletnu synchronizaciu s trakt.tv
+            * [COLOR FF50FF42]add[/COLOR] podpora pre SKIN: Arctic: Zephyr - Reloaded SC mod
+            * [COLOR FF50FF42]add[/COLOR] po vypnuti debugu cez nastavenie sa odosiela kodi.log na web a po uspesnom odoslani sa zobrazi URL (pri podporovanej platforme sa URL nakopiruje do pamate a nasledne sa da vlozit)
+            * [COLOR FFFFAE42]fix[/COLOR] uprava/optimalizacia automatickeho vyberu audio stopy
+            * [COLOR FFFFAE42]fix[/COLOR] synchronizacie epizod z trakt - nenatahuje sa cela historia, ale len cas
+            * [COLOR FFFFAE42]fix[/COLOR] ListItem uz ma aj Title - fix pre SKIN
+
+              [I][B]2.1.15[/B][/I]
+            * [COLOR FFFFAE42]fix[/COLOR] presunute nastavenie pre Dolby Vision
+            * [COLOR FF50FF42]add[/COLOR] moznost neponukat HDR subory
+
+              [I][B]2.1.14[/B][/I]
+            * [COLOR FFFFAE42]fix[/COLOR] fix cache
+            * [COLOR FF50FF42]add[/COLOR] v zaklade odfiltrovane Dolby Vision subory
+
+              [I][B]2.1.13[/B][/I]
+            * [COLOR FFFFAE42]fix[/COLOR] settings
+
+              [I][B]2.1.12[/B][/I]
+            * [COLOR FFFFAE42]fix[/COLOR] trakt.tv rychlost
+            * [COLOR FFFFAE42]fix[/COLOR] cache
+
+              [I][B]2.1.11[/B][/I]
+            * [COLOR FFFFAE42]fix[/COLOR] trakt.tv obnova tokenu
+            * [COLOR FFFFAE42]fix[/COLOR] oneskorena synchronizacia po starte
+
+              [I][B]2.1.10[/B][/I]
+            * [COLOR FF50FF42]add[/COLOR] struktura menu z KODI 18 a nizsie
+            * [COLOR FF50FF42]add[/COLOR] struktura menu z KODI 19 sa da zapnut v nastaveniach
+            * [COLOR FFFFAE42]fix[/COLOR] trakt error
+            * [COLOR FFFF5042]remove[/COLOR] oznacenie lite pluginu - uz je plna funkcionalita okrem kniznice
+
+              [I][B]2.1.9[/B][/I]
+            * [COLOR FFFFAE42]fix[/COLOR] chyba s prihlasovanim na kra.sk
+            * [COLOR FFFFAE42]fix[/COLOR] chyb po vyprsani predplatneho
+            * [COLOR FFFFAE42]fix[/COLOR] chyb s trakt.tv
+        </news>
+    </extension>
+</addon><addon id="repo.TheLittleRock" name="TheLittleRock repo" version="1.0" provider-name="TheLittleRock">
+    <extension point="xbmc.addon.repository" name="TheLittleRock repo">
+        <dir>
+            <info compressed="false">https://raw.githubusercontent.com/TheLittleRock/kodi/master/repo/zips/addons.xml</info>
+            <checksum>https://raw.githubusercontent.com/TheLittleRock/kodi/master/repo/zips/addons.xml.md5</checksum>
+            <datadir zip="true">https://raw.githubusercontent.com/TheLittleRock/kodi/master/repo/zips/</datadir>
+        </dir>
+    </extension>
+    <extension point="xbmc.addon.metadata">
+        <summary>TheLittleRock repo</summary>
+        <description>Bla bla bla</description>
+        <disclaimer />
+        <platform>all</platform>
+        <assets>
+            <icon>icon.png</icon>
+            <fanart>fanart.jpg</fanart>
+        </assets>
+    </extension>
+</addon></addons>
