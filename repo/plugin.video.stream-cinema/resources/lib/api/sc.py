@@ -38,7 +38,7 @@ class Sc:
     static_cache_type = None
 
 
-    @staticmethod
+    '''@staticmethod
     def handle_token_error():
         dok("Chybný X-AUTH-TOKEN", "Váš token je neplatný nebo vypršel. Zadejte nový token.")
         new_token = dinput("Zadejte nový X-AUTH-TOKEN:", "")
@@ -47,7 +47,41 @@ class Sc:
             return new_token
         else:
             dok("Chyba", "Neplatný token. Akce zrušena.")
+            return None'''
+    @staticmethod
+    def handle_token_error():
+        # Load tokens from settings
+        tokens_json = ADDON.getSetting('system.auth_tokens')
+        tokens = []
+        if tokens_json:
+            try:
+                tokens = json.loads(tokens_json)
+            except Exception:
+                tokens = []
+        # Prepare menu options
+        options = [t for t in tokens]
+        options.append('[+] Přidat nový token')
+        # Show selection dialog
+        selected = dselect(options, "Vyberte TOKEN nebo přidejte nový")
+        if selected is None:
+            dok("Chyba", "Akce zrušena.")
             return None
+        if selected == len(options) - 1:
+            # Add new token
+            new_token = dinput("Zadejte nový TOKEN:", "")
+            if new_token and len(new_token) == 32:
+                tokens.append(new_token)
+                ADDON.setSetting('system.auth_tokens', json.dumps(tokens))
+                ADDON.setSetting('system.auth_token', new_token)
+                return new_token
+            else:
+                dok("Chyba", "Neplatný token. Akce zrušena.")
+                return None
+        else:
+            # Use selected token
+            token = tokens[selected]
+            ADDON.setSetting('system.auth_token', token)
+            return token
 
     @staticmethod
     def get(path, params=None, ttl=None):
