@@ -1,4 +1,4 @@
-<addon id="plugin.video.stream-cinema" name="SC CZ/SK - token selection edition" provider-name="bbaron" version="1.1">
+<addon id="plugin.video.stream-cinema" name="SC CZ/SK - token selection edition" provider-name="bbaron" version="1.2">
     <requires>
         <import addon="xbmc.python" version="3.0.0"/>
         <import addon="script.module.requests" version="2.25.1"/>
@@ -45,6 +45,10 @@
             obsahu. Tento doplňek pouze vyhledáva zpřístupněný obsah na kra.sk. Použití na vlastní odpovědnost!
         </disclaimer>
         <news>[B]Novinky[/B]
+              [I][B]1.1[/B][/I]
+            * [COLOR FF50FF42]add[/COLOR] výběr tokenu v menu. 
+            * [COLOR FFFFAE42]fix[/COLOR] oprava zacyklení při aktivním traktu. Dotaz na token se provádí pouze jednou. Znovu až po restartu nebo z menu.
+
               [I][B]1.1[/B][/I]
             * [COLOR FF50FF42]add[/COLOR] možnost výběru tokenu 
 
