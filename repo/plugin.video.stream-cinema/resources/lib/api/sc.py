@@ -14,7 +14,7 @@ from resources.lib.constants import BASE_URL, API_VERSION, SC, ADDON
 from resources.lib.kodiutils import get_uuid, get_skin_name, get_setting_as_bool, get_setting_as_int, get_setting, \
     file_put_contents, translate_path, file_exists, file_get_contents
 from resources.lib.system import user_agent, Http, SYSTEM_LANG_CODE
-from resources.lib.gui.dialog import dok, dinput, dselect
+from resources.lib.gui.dialog import dok, dinput, dselect, dyesno
 
 try:
     # Python 3
@@ -57,7 +57,7 @@ class Sc:
             return None
         Sc.token_prompt_shown = True
 
-        # Load tokens from settings
+        # Load tokens from settings (if any)
         tokens_json = ADDON.getSetting('system.auth_tokens')
         tokens = []
         if tokens_json:
@@ -67,20 +67,21 @@ class Sc:
                 tokens = []
 
         # Get current token from settings
-        current_token = ADDON.getSetting('system.auth_token')
+        current_token = ADDON.getSetting('system.auth_token') #for displaying it as active
         options = []
         current_token_index = None
 
         # Build options, marking the current token
         for idx, t in enumerate(tokens):
             if t == current_token:
-                options.append("[AKTIVNÍ] {}".format(t))
+                options.append("[B][AKTIVNÍ][/B] {}".format(t)) #mark currently activated token
                 current_token_index = idx
             else:
                 options.append(t)
         options.append('[+] Přidat nový token')
 
         # Show selection dialog
+        dok('Špatný token','Váš AUTH-TOKEN je neplatný. V následujícím menu vyberte existující token nebo přidejte nový. [CR] Tokeny lze také spravovat v nastavení.')
         selected = dselect(options, "Vyberte TOKEN nebo přidejte nový")
         if selected is None:
             dok("Chyba", "Akce zrušena.")
@@ -98,7 +99,7 @@ class Sc:
                 return None
         else:
             # Use selected token (strip marker if present)
-            if options[selected].startswith("[AKTIVNÍ]"):
+            if options[selected].startswith("[B][AKTIVNÍ][/B]"):
                 token = tokens[selected]
             else:
                 token = tokens[selected]
@@ -121,12 +122,14 @@ class Sc:
             options = []
             for idx, t in enumerate(tokens):
                 if t == current_token:
-                    options.append("[AKTIVNÍ] {}".format(t))
+                    options.append("[B][AKTIVNÍ][/B] {}".format(t))
                 else:
                     options.append(t)
+            options.append("----------------------NÁSTROJE----------------------")
             options.append('[+] Přidat nový token')
             if tokens:
                 options.append('[–] Smazat token')
+            options.append('[=] Upload tokenu na kra.sk')
             options.append('[Zavřít]')
 
             selected = dselect(options, "Správa TOKENů")
@@ -153,9 +156,25 @@ class Sc:
                         ADDON.setSetting('system.auth_token', "")
                         current_token = ""
                     ADDON.setSetting('system.auth_tokens', json.dumps(tokens))
+            elif options[selected] == '[=] Upload tokenu na kra.sk':
+                from resources.lib.api.kraska import Kraska
+                # Show warning dialog
+                dok("Upozornění", "Upload tokenu na kra.sk je na vlastní nebezpečí. Pokud máte na kra funkční token, udělejte si zálohu! [CR] Aktuální token na kra.sk (v sc.json) bude přepsán.")
+                if dyesno("Potvrzení", "Opravdu chcete nahrát aktuální token na kra.sk?","Ano", "Ne") is False:
+                    dok("Zrušeno", "Upload tokenu byl zrušen.")
+                    continue
+                if not current_token or len(current_token) != 32:
+                    dok("Chyba", "Není k dispozici platný aktuální token pro upload.")
+                    continue
+                try:
+                    kr = Kraska()
+                    kr.upload(current_token, SC.BCK_FILE)
+                    dok("Hotovo", "Token byl nahrán na kra.sk jako sc.json.")
+                except Exception as e:
+                    debug("Chyba, Nepodařilo se nahrát token na kra.sk: {}".format(str(e)))
             else:
                 # Select token
-                sel_token = tokens[selected] if not options[selected].startswith("[AKTIVNÍ]") else current_token
+                sel_token = tokens[selected] if not options[selected].startswith("[B][AKTIVNÍ][/B]") else current_token
                 ADDON.setSetting('system.auth_token', sel_token)
                 current_token = sel_token
 
@@ -317,6 +336,8 @@ class Sc:
                         try:
                             url = kr.resolve(f.get('ident'))
                             data = Http.get(url)
+                            #dok("Token z kra:".format(data.text)) 
+                            debug('Token z kra: {}'.format(data.text))
                             if len(data.text) == 32:
                                 token = data.text
                                 ADDON.setSetting('system.auth_token', token)
@@ -328,7 +349,10 @@ class Sc:
 
             path = '/auth/token'
             sorted_values, url = Sc.prepare(path=path, params={})
+            debug('get auth token from server {}'.format(url))
+            debug('get auth token from server params {}'.format(sorted_values))
             res = Http.post(url, params=sorted_values, headers=Sc.headers(False))
+            debug('get auth token from server response {}'.format(res.text))
             res.raise_for_status()
             ret = res.json()
             if 'error' in ret:
