@@ -55,11 +55,11 @@ class Sc:
     @staticmethod
     def handle_token_error():
 
-        home_win = xbmcgui.Window(10000)
-        if home_win.getProperty('sc_token_prompt_shown') == '1':
-            dok("Chybný TOKEN", "Váš token je pravděpodobně neplatný. Nový token můžete zadat v nastavení ve správě tokenů.")
-            return None
-        home_win.setProperty('sc_token_prompt_shown', '1')
+        #home_win = xbmcgui.Window(10000)
+        #if home_win.getProperty('sc_token_prompt_shown') == '1':
+        #    dok("Chybný TOKEN", "Váš token je pravděpodobně neplatný. Nový token můžete zadat v nastavení ve správě tokenů.")
+        #    return None
+        #home_win.setProperty('sc_token_prompt_shown', '1')
 
         # Load tokens from settings (if any)
         tokens_json = ADDON.getSetting('system.auth_tokens')
@@ -339,9 +339,11 @@ class Sc:
 
     @staticmethod
     def get_auth_token(force = False):
-        token = ''
-        if force is False:
-            token = ADDON.getSetting('system.auth_token')
+        #token = ''
+        #if force is False:
+        #    token = ADDON.getSetting('system.auth_token')
+        
+        token = ADDON.getSetting('system.auth_token')
 
         if token == '' or token is None or token == 'None' or token is False:
             from resources.lib.api.kraska import Kraska

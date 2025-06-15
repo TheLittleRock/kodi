@@ -1,4 +1,4 @@
-<addon id="plugin.video.stream-cinema" name="SC CZ/SK - token selection edition" provider-name="bbaron, edited by TheLittleRock" version="1.3.3">
+<addon id="plugin.video.stream-cinema" name="SC CZ/SK - token selection edition" provider-name="bbaron, edited by TheLittleRock" version="1.3.4">
     <requires>
         <import addon="xbmc.python" version="3.0.0"/>
         <import addon="script.module.requests" version="2.25.1"/>
@@ -45,6 +45,10 @@
             obsahu. Tento doplňek pouze vyhledáva zpřístupněný obsah na kra.sk. Použití na vlastní odpovědnost!
         </disclaimer>
         <news>[B]Novinky[/B]
+              [I][B]1.3.4[/B][/I] 
+            * [COLOR FF50FF42]add[/COLOR] token se stáhne z kra.sk pouze a jen tehdy, pokud není v nastavení uložen žádný token.
+            * [COLOR FFFFAE42]fix[/COLOR] dialog pro správu tokenů se nyní zobrazuje při každém podchycení 404 get a post requestů.
+
               [I][B]1.3.2[/B][/I] 
             * [COLOR FFFFAE42]fix[/COLOR] fix bugu, kdy se tokeny neukládaly do nastavení, ale pouze do cache.
             * [COLOR FFFFAE42]fix[/COLOR] fix nekonečné smyčky dialogu při aktivní synchronizaci s trakt.tv.
