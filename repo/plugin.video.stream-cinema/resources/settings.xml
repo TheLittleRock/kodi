@@ -5,15 +5,16 @@
         <setting type="lsep" label="30011"/>
         <setting type="text" label="30012" id="kraska.user" default=""/>
         <setting type="text" label="30013" id="kraska.pass" default="" option="hidden"/>
-<!--        <setting type="action" label="xxxx" action="RunPlugin(plugin://plugin.video.stream-cinema?action=696e74726f)" />-->
+        <setting type="action" label="xxxx" action="RunPlugin(plugin://plugin.video.stream-cinema?action=696e74726f)" />
         <setting type="text" label="30015" id="kraska.days.left" default="" enable="false"/>
         <setting type="text" label="30016" id="kraska.token" default="" enable="false"/>
-        <setting type="text" label="30017" id="system.uuid" default="" enable="false"/>
+        <setting type="text" label="30017" id="system.uuid" default="" enable="true"/>
         <setting type="text" label="30018" id="system.ver" default="" enable="false"/>
-        <setting type="text" label="30072" id="system.auth_token" default="" enable="false"/>
+        <setting type="text" label="30072" id="system.auth_token" default="" enable="true"/>
         <setting type="text" id="system.changelog" default="" visible="false"/>
         <setting type="text" id="kraska.chsum" default="" visible="false"/>
         <setting type="action" label="Správa TOKENů" action="RunPlugin(plugin://plugin.video.stream-cinema?action=manage_tokens)" />
+        <setting type="text" label="Tokeny" id="system.auth_tokens" default="" visible="false"/>
     </category>
     <category label="30019">
         <setting type="bool" label="30060" id="plugin.show.genre" default="false"/>

@@ -7,6 +7,7 @@ import json
 import time
 import traceback
 import requests
+import xbmcgui
 
 from resources.lib.common.cache import SimpleCache, use_cache
 from resources.lib.common.logger import debug, info
@@ -15,6 +16,7 @@ from resources.lib.kodiutils import get_uuid, get_skin_name, get_setting_as_bool
     file_put_contents, translate_path, file_exists, file_get_contents
 from resources.lib.system import user_agent, Http, SYSTEM_LANG_CODE
 from resources.lib.gui.dialog import dok, dinput, dselect, dyesno
+from resources.lib.services.Settings import settings
 
 try:
     # Python 3
@@ -49,13 +51,15 @@ class Sc:
             dok("Chyba", "Neplatný token. Akce zrušena.")
             return None'''
     
-    token_prompt_shown = False
 
     @staticmethod
     def handle_token_error():
-        if Sc.token_prompt_shown:
+
+        home_win = xbmcgui.Window(10000)
+        if home_win.getProperty('sc_token_prompt_shown') == '1':
+            dok("Chybný TOKEN", "Váš token je pravděpodobně neplatný. Nový token můžete zadat v nastavení ve správě tokenů.")
             return None
-        Sc.token_prompt_shown = True
+        home_win.setProperty('sc_token_prompt_shown', '1')
 
         # Load tokens from settings (if any)
         tokens_json = ADDON.getSetting('system.auth_tokens')
@@ -81,7 +85,7 @@ class Sc:
         options.append('[+] Přidat nový token')
 
         # Show selection dialog
-        dok('Špatný token','Váš AUTH-TOKEN je neplatný. V následujícím menu vyberte existující token nebo přidejte nový. [CR] Tokeny lze také spravovat v nastavení.')
+        dok('Špatný token','Váš AUTH-TOKEN je neplatný. V následujícím menu vyberte existující token nebo přidejte nový. [CR]Tokeny lze také spravovat v nastavení.')
         selected = dselect(options, "Vyberte TOKEN nebo přidejte nový")
         if selected is None:
             dok("Chyba", "Akce zrušena.")
@@ -93,9 +97,10 @@ class Sc:
                 tokens.append(new_token)
                 ADDON.setSetting('system.auth_tokens', json.dumps(tokens))
                 ADDON.setSetting('system.auth_token', new_token)
+                settings.refresh()
                 return new_token
             else:
-                dok("Chyba", "Neplatný token. Akce zrušena.")
+                dok("Chyba", "Token má špatný formát. Akce zrušena.")
                 return None
         else:
             # Use selected token (strip marker if present)
@@ -119,6 +124,7 @@ class Sc:
 
         current_token = ADDON.getSetting('system.auth_token')
         while True:
+
             options = []
             for idx, t in enumerate(tokens):
                 if t == current_token:
@@ -139,11 +145,16 @@ class Sc:
                 new_token = dinput("Zadejte nový TOKEN:", "")
                 if new_token and len(new_token) == 32:
                     tokens.append(new_token)
-                    ADDON.setSetting('system.auth_tokens', json.dumps(tokens))
+                    debug("Token json: {}".format(json.dumps(tokens)))
+                    try:
+                        ADDON.setSetting('system.auth_tokens', json.dumps(tokens))
+                        settings.refresh()
+                    except Exception as e:
+                        debug("Error saving tokens: {}".format(str(e)))
                     ADDON.setSetting('system.auth_token', new_token)
                     current_token = new_token
                 else:
-                    dok("Chyba", "Neplatný token. Akce zrušena.")
+                    dok("Chyba", "Token má špatný formát. Akce zrušena.")
             elif options[selected] == '[–] Smazat token':
                 if not tokens:
                     dok("Chyba", "Žádné tokeny k odstranění.")
@@ -154,8 +165,10 @@ class Sc:
                     if del_token == current_token:
                         # If deleted token was current, unset
                         ADDON.setSetting('system.auth_token', "")
+                        settings.refresh()
                         current_token = ""
                     ADDON.setSetting('system.auth_tokens', json.dumps(tokens))
+                    settings.refresh()
             elif options[selected] == '[=] Upload tokenu na kra.sk':
                 from resources.lib.api.kraska import Kraska
                 # Show warning dialog
