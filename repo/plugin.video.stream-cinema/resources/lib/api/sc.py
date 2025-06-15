@@ -149,6 +149,7 @@ class Sc:
                     try:
                         ADDON.setSetting('system.auth_tokens', json.dumps(tokens))
                         settings.refresh()
+                        debug("Tokeny z nastavení: {}".format(ADDON.getSetting('system.auth_tokens')))
                     except Exception as e:
                         debug("Error saving tokens: {}".format(str(e)))
                     ADDON.setSetting('system.auth_token', new_token)
@@ -156,19 +157,23 @@ class Sc:
                 else:
                     dok("Chyba", "Token má špatný formát. Akce zrušena.")
             elif options[selected] == '[–] Smazat token':
+                debug("Tokeny před odstraněním: {}".format(tokens))
                 if not tokens:
                     dok("Chyba", "Žádné tokeny k odstranění.")
                     continue
                 del_idx = dselect(tokens, "Vyberte token k odstranění")
                 if del_idx is not None:
+                    debug("Odstraňuji token: {}".format(tokens[del_idx]))
                     del_token = tokens.pop(del_idx)
+                    debug("Odstranený token: {}".format(del_token))
                     if del_token == current_token:
                         # If deleted token was current, unset
                         ADDON.setSetting('system.auth_token', "")
-                        settings.refresh()
                         current_token = ""
+                    debug("Tokeny po odstranění: {}".format(tokens))
                     ADDON.setSetting('system.auth_tokens', json.dumps(tokens))
                     settings.refresh()
+                    debug("Tokeny z nastavení po odstranění: {}".format(ADDON.getSetting('system.auth_tokens')))
             elif options[selected] == '[=] Upload tokenu na kra.sk':
                 from resources.lib.api.kraska import Kraska
                 # Show warning dialog
@@ -219,11 +224,11 @@ class Sc:
                     if new_token:
                         # Retry with new token
                         res = Http.get(url, headers=Sc.headers(), params=sorted_values)
-                        res.raise_for_status()
+                        #res.raise_for_status()
                     else:
-                        raise
+                        pass
                 else:
-                    raise
+                    pass
             ret = res.json()
             debug("Odpoved: {}".format(res.json))
             Sc.save_cache(ret, key, ttl)
@@ -261,11 +266,11 @@ class Sc:
                 new_token = Sc.handle_token_error()
                 if new_token:
                     res = Http.post(url, params=sorted_values, headers=Sc.headers(), **kwargs)
-                    res.raise_for_status()
+                    #res.raise_for_status()
                 else:
-                    raise
+                    pass#raise
             else:
-                raise
+                pass#raise
         ret = res.json()
         debug('POST took {0:.2f}ms'.format((time.time() - start) * 1000))
         return ret
